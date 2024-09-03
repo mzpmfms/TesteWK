@@ -1,0 +1,82 @@
+# Arquivos compilados e executáveis
+*.exe
+*.dll
+*.so
+*.dylib
+
+# Arquivos de configuração do Delphi e do RAD Studio
+__history/
+*.local
+*.identcache
+*.drc
+*.map
+*.cfg
+*.dsk
+*.dproj.local
+*.bdsproj.local
+*.user.local
+*.bdsgroup.local
+*.dproj
+
+# Arquivos temporários e de backup
+__recovery/
+*.bak
+*.~*
+
+# Arquivos de log e debugging
+*.log
+*.stackdump
+
+# Arquivos de cache
+__history/
+__recovery/
+
+# Outros arquivos e diretórios gerados automaticamente
+*.autosave
+*.backup
+*.o
+*.obj
+*.rsm
+*.tvsconfig
+*.tvsstate
+*.tvsuser
+
+# Ignorar pastas de output
+bin/
+debug/
+release/
+
+# Arquivos de imagem, vídeos, e outros tipos que podem ser pesados
+*.jpg
+*.jpeg
+*.png
+*.gif
+*.bmp
+*.tiff
+*.avi
+*.mpg
+*.mpeg
+*.mp3
+*.wav
+*.ogg
+*.iso
+*.flv
+
+# Arquivos de código gerados automaticamente
+*.dfm
+*.pas~
+
+# Ignorar cache de arquivos do Delphi
+__history/
+__recovery/
+*.identcache
+
+# Ignorar backups e logs
+*.bak
+*.~*
+*.old
+
+# Ignorar arquivos do Debugger do Delphi
+*.local
+*.tvsconfig
+*.tvsstate
