@@ -1,0 +1,14 @@
+program TesteWK;
+
+uses
+  Vcl.Forms,
+  UnitPrincipal in '..\src\views\UnitPrincipal.pas' {frmPrincipal};
+
+{$R *.res}
+
+begin
+  Application.Initialize;
+  Application.MainFormOnTaskbar := True;
+  Application.CreateForm(TfrmPrincipal, frmPrincipal);
+  Application.Run;
+end.

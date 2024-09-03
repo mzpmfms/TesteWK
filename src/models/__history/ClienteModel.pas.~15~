@@ -1,0 +1,41 @@
+unit ClienteModel;
+
+interface
+
+uses FireDAC.Stan.Intf,
+  FireDAC.Stan.Option, FireDAC.Stan.Param, FireDAC.Stan.Error, FireDAC.DatS,
+  FireDAC.Phys.Intf, FireDAC.DApt.Intf, FireDAC.Stan.Async, FireDAC.DApt,
+  FireDAC.Comp.DataSet, FireDAC.Comp.Client, Conexao;
+
+type
+  TCliente = class
+
+  private
+    FCodigo: Integer;
+    FNome: String;
+    FCidade: String;
+    FUF: String;
+  public
+    property Codigo: Integer read FCodigo write FCodigo;
+    property Nome: String read FNome write FNome;
+    property Cidade: String read FCidade write FCidade;
+    property UF: String read FUF write FUF;
+
+    class function GetClientes:TArray<TCliente>;
+  end;
+
+
+
+
+implementation
+
+
+{ TCliente }
+
+
+class function TCliente.GetClientes: TArray<TCliente>;
+
+
+end;
+
+end.

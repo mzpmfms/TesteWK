@@ -1,0 +1,107 @@
+unit Dao;
+
+interface
+
+uses
+  System.Classes, Data.DB, Datasnap.DBClient, ClienteModel,
+  FireDAC.Comp.Client, Conexao, System.Generics.Collections;
+
+type
+  TDao = class
+
+    FConexao: TConexao;
+    private
+
+    public
+      property Conexao: TConexao read FConexao write FConexao;
+
+      constructor Create(AOwner: TComponent);
+      destructor Destroy; override;
+
+      class function ObterClientes: TList<TCliente>;
+      class function ObterClientePorCodigo(codigo: String): String;
+  end;
+
+
+implementation
+
+{ Dao }
+
+constructor TClienteDao.Create(AOwner: TComponent);
+begin
+  Conexao := TConexao.Create;
+end;
+
+destructor TClienteDao.Destroy;
+begin
+  Conexao.Free;
+
+  inherited;
+end;
+
+
+class function TClienteDao.ObterClientes: TList<TCliente>;
+var
+  ClientesList: TList<TCliente>;
+  Cliente: TCliente;
+
+  dao: TClienteDao;
+begin
+
+  dao := TClienteDao.Create(nil);
+
+  ClientesList := TList<TCliente>.Create;
+  try
+
+    dao.Query.SQL.Text := 'SELECT * FROM Clientes';
+    dao.Query.Open;
+
+    while not (dao.Query.eof) do
+    begin
+      Cliente := TCliente.Create;
+      Cliente.Codigo := dao.Query.FieldByName('Codigo').AsInteger;
+      Cliente.Nome := dao.Query.FieldByName('Nome').AsString;
+      Cliente.Cidade := dao.Query.FieldByName('Cidade').AsString;
+      Cliente.UF := dao.Query.FieldByName('UF').AsString;
+
+      ClientesList.Add(Cliente);
+
+      dao.Query.Next;
+    end;
+
+    Result := ClientesList;
+  finally
+    dao.Query.Free;
+    dao.Conexao.Free;
+  end;
+
+end;
+
+class function TClienteDao.ObterClientePorCodigo(codigo: String): String;
+var
+  Conexao: TConexao;
+  Qry: TFDQuery;
+begin
+  Conexao := TConexao.Create;
+  qry := TFDQuery.Create(nil);
+
+  Result := '';
+
+  try
+    qry.Connection := Conexao.FConexao;
+    qry.SQL.Text := 'Select Nome From Clientes Where Codigo = ' + codigo;
+    qry.Open;
+
+    if qry.RecordCount > 0 then
+      Result := qry.FieldByName('Nome').AsString;
+  finally
+    qry.Free;
+    Conexao.Free;
+  end;
+
+end;
+
+end.
+
+
+

@@ -1,0 +1,51 @@
+unit IniFileHelper;
+
+interface
+
+uses
+  System.SysUtils, System.IniFiles, Vcl.Forms;
+
+type
+  TIniFileHelper = class
+  private
+    FArquivo: TIniFile;
+    function CaminhoDaAplicacao: String;
+  public
+    constructor Create;
+    destructor Destroy; override;
+    procedure SetArquivoIni(Secao, Identidade, Valor: String);
+    function GetArquivoIni(Secao, Identidade, ValorDefault: String): String;
+  end;
+
+implementation
+
+{ TIniFileHelper }
+
+constructor TIniFileHelper.Create;
+begin
+  FArquivo := TIniFile.Create(CaminhoDaAplicacao);
+end;
+
+destructor TIniFileHelper.Destroy;
+begin
+  FArquivo.Free;
+  inherited;
+end;
+
+function TIniFileHelper.GetArquivoIni(Secao, Identidade,
+  ValorDefault: String): String;
+begin
+
+end;
+
+function TIniFileHelper.CaminhoDaAplicacao: String;
+begin
+  Result := ExtractFilePath(Application.ExeName) + 'config.ini';
+end;
+
+procedure TIniFileHelper.SetArquivoIni(Secao, Identidade, ValorDefault: String);
+begin
+  Result := FArquivo.ReadString(Secao, Identidade, ValorDefault);
+end;
+
+end.

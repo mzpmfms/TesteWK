@@ -1,0 +1,17 @@
+program TesteWK;
+
+uses
+  Vcl.Forms,
+  UnitPrincipal in '..\src\views\UnitPrincipal.pas' {frmPrincipal},
+  Conexao in '..\src\models\Conexao.pas',
+  DM in '..\src\models\DM.pas',
+  IniFileHelper in '..\src\models\Helpers\IniFileHelper.pas';
+
+{$R *.res}
+
+begin
+  Application.Initialize;
+  Application.MainFormOnTaskbar := True;
+  Application.CreateForm(TfrmPrincipal, frmPrincipal);
+  Application.Run;
+end.

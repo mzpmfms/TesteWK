@@ -1,0 +1,53 @@
+unit PedidoController;
+
+interface
+
+uses
+  System.Classes, Data.DB, Datasnap.DBClient, PedidoModel, Dao,
+  FireDAC.Comp.Client, Conexao, System.Generics.Collections;
+
+type
+  TPedidoController = class
+    FDao: TPedidoDao;
+    private
+
+    public
+      constructor Create(AOwner: TComponent);
+      destructor Destroy; override;
+
+      function ObterPedidoPorNumero(numero: Integer): TPedido;
+      function ObterProximoNumero: Integer;
+  end;
+
+
+implementation
+
+{ TPedidoController }
+
+{ TPedido }
+
+constructor TPedido.Create(AOwner: TComponent);
+begin
+
+end;
+
+destructor TPedido.Destroy;
+begin
+
+  inherited;
+end;
+
+function TPedido.ObterPedidoPorNumero(numero: Integer): TPedido;
+begin
+
+end;
+
+function TPedido.ObterProximoNumero: Integer;
+begin
+
+end;
+
+end.
+
+
+

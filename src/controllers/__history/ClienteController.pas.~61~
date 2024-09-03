@@ -1,0 +1,56 @@
+unit ClienteController;
+
+interface
+
+uses
+  System.Classes, Data.DB, Datasnap.DBClient, ClienteDao, ClienteModel,
+  FireDAC.Comp.Client, Conexao, System.Generics.Collections;
+
+type
+  TClienteController = class
+
+  FDao: TClienteDao;
+  FModel: TCliente;
+  private
+
+  public
+    constructor Create(AOwner: TComponent);
+    destructor Destroy; override;
+
+    function ObterClientes: TList<TCliente>;
+    function ObterClientePorCodigo(codigo: String): String;
+  end;
+
+
+implementation
+
+
+{ TClienteController }
+
+constructor TClienteController.Create(AOwner: TComponent);
+begin
+  FDao := TClienteDao.Create(nil);
+  FModel := TClienteModel.Create(nil);
+end;
+
+destructor TClienteController.Destroy;
+begin
+  FDao.Free;
+
+  inherited;
+end;
+
+function TClienteController.ObterClientePorCodigo(codigo: String): String;
+begin
+  Result := FDao.ObterClientePorCodigo(codigo);
+end;
+
+function TClienteController.ObterClientes: TList<TCliente>;
+begin
+
+end;
+
+end.
+
+
+

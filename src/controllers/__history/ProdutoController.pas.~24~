@@ -1,0 +1,127 @@
+unit ProdutoController;
+
+interface
+
+uses
+  System.Classes, Data.DB, Datasnap.DBClient, ProdutoModel,
+  FireDAC.Comp.Client, Conexao, System.Generics.Collections;
+
+type
+  TProdutoController = class
+
+  FValorDoProduto: Double;
+  FNomeDoProduto: String;
+  private
+    FDataSource: TDataSource;
+    FTabela: TFDMemTable;
+  public
+    property Valor: Double read FValorDoProduto write FValorDoProduto;
+    property Nome: String read FNomeDoProduto write FNomeDoProduto;
+
+    constructor Create(AOwner: TComponent);
+    destructor Destroy; override;
+
+    class function ObterProdutos: TList<TProduto>;
+    class function ObterProdutoPorCodigo(codigo: String): Boolean;
+  end;
+
+
+implementation
+
+{ TClienteController }
+
+constructor TProdutoController.Create(AOwner: TComponent);
+begin
+
+  FDataSource := TDataSource.Create(AOwner);
+  FTabela :=  TFDMemTable.Create(AOwner);
+
+  ObterProdutos;
+end;
+
+destructor TProdutoController.Destroy;
+begin
+  FDataSource.Free;
+  FTabela.Free;
+
+  inherited;
+end;
+
+
+class function TProdutoController.ObterProdutos: TList<TProduto>;
+var
+  Conexao: TConexao;
+  Qry: TFDQuery;
+
+  ProdutosList: TList<TProduto>;
+  Produto: TProduto;
+begin
+
+  Conexao := TConexao.Create;
+  qry := TFDQuery.Create(nil);
+
+  try
+    qry.Connection := Conexao.FConexao;
+    qry.SQL.Text := 'Select * From Produtos';
+    qry.Open;
+
+    ProdutosList := TList<TProduto>.Create;
+    try
+
+      while not (qry.eof) do
+      begin
+        Produto := TProduto.Create;
+        Produto.Codigo := qry.FieldByName('Codigo').AsInteger;
+        Produto.Descricao := qry.FieldByName('Descricao').AsString;
+        Produto.Preco_Venda := qry.FieldByName('Preco_Venda').AsFloat;
+
+        ProdutosList.Add(Produto);
+
+        qry.Next;
+      end;
+
+      Result := ProdutosList;
+    finally
+      qry.Free;
+      Conexao.Free;
+    end;
+
+
+  finally
+
+  end;
+
+end;
+
+function TProdutoController.ObterProdutoPorCodigo(codigo: String): Boolean;
+var
+  Conexao: TConexao;
+  Qry: TFDQuery;
+begin
+  Conexao := TConexao.Create;
+  qry := TFDQuery.Create(nil);
+
+  Result := False;
+
+  try
+    qry.Connection := Conexao.FConexao;
+    qry.SQL.Text := 'Select Descricao as Nome, Preco_Venda as Valor From Produtos Where Codigo = ' + codigo;
+    qry.Open;
+
+    if qry.RecordCount > 0 then
+      Result := True;
+
+    Valor := qry.FieldByName('Valor').AsFloat;
+    Nome  := qry.FieldByName('Nome').AsString;
+
+  finally
+    qry.Free;
+    Conexao.Free;
+  end;
+
+end;
+
+end.
+
+
+

@@ -1,0 +1,51 @@
+unit IniFileHelper;
+
+interface
+
+uses
+  System.SysUtils, System.IniFiles, Vcl.Forms;
+
+type
+  TIniFileHelper = class
+  private
+    FArquivo: TIniFile;
+    function GetIniFile: String;
+  public
+    constructor Create;
+    destructor Destroy; override;
+    procedure SetArquivoIni(Secao, Identidade, Valor: String);
+    function GetArquivoIni(Secao, Identidade, ValorDefault: String): String;
+  end;
+
+implementation
+
+{ TIniFileHelper }
+
+constructor TIniFileHelper.Create;
+begin
+  FArquivo := TIniFile.Create(GetIniFile);
+end;
+
+destructor TIniFileHelper.Destroy;
+begin
+
+  inherited;
+end;
+
+function TIniFileHelper.GetArquivoIni(Secao, Identidade,
+  ValorDefault: String): String;
+begin
+
+end;
+
+function TIniFileHelper.GetIniFile: String;
+begin
+
+end;
+
+procedure TIniFileHelper.SetArquivoIni(Secao, Identidade, Valor: String);
+begin
+
+end;
+
+end.

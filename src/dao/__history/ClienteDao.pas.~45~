@@ -1,0 +1,113 @@
+unit ClienteDao;
+
+interface
+
+uses
+  System.Classes, Data.DB, Datasnap.DBClient, Dao, ClienteModel,
+  FireDAC.Comp.Client, Conexao, System.Generics.Collections,
+  System.SysUtils, Vcl.Dialogs;
+
+type
+  TClienteDao = class
+    FDao: TDao;
+    FQuery: TFDQuery;
+    private
+
+    public
+      property Dao: TDao read FDao write FDao;
+      property Query: TFDQuery read FQuery write FQuery;
+
+      constructor Create(AOwner: TComponent);
+      destructor Destroy; override;
+
+      class function ObterClientes: TList<TCliente>;
+      function ObterClientePorCodigo(codigo: String): String;
+  end;
+
+
+implementation
+
+
+{ Dao }
+
+constructor TClienteDao.Create(AOwner: TComponent);
+begin
+  Dao := TDao.Create;
+
+  Query := TFDQuery.Create(nil);
+  Query.Connection := Dao.obterConexao;
+end;
+
+destructor TClienteDao.Destroy;
+begin
+
+  Query.Free;
+  Dao.Free;
+
+  inherited;
+end;
+
+
+class function TClienteDao.ObterClientes: TList<TCliente>;
+var
+  ClientesList: TList<TCliente>;
+  ClienteDao: TClienteDao;
+  Cliente: TCliente;
+begin
+
+  ClientesList := TList<TCliente>.Create;
+  try
+
+    ClienteDao.Query.SQL.Text := 'SELECT * FROM Clientes';
+    ClienteDao.Query.Open;
+
+    while not (ClienteDao.Query.eof) do
+    begin
+      Cliente := TCliente.Create;
+      Cliente.Codigo := ClienteDao.Query.FieldByName('Codigo').AsInteger;
+      Cliente.Nome := ClienteDao.Query.FieldByName('Nome').AsString;
+      Cliente.Cidade := ClienteDao.Query.FieldByName('Cidade').AsString;
+      Cliente.UF := ClienteDao.Query.FieldByName('UF').AsString;
+
+      ClientesList.Add(Cliente);
+
+      ClienteDao.Query.Next;
+    end;
+
+    Result := ClientesList;
+  except
+    On E: Exception do
+      ShowMessage('Erro: ' + E.Message);
+  end;
+
+end;
+
+function TClienteDao.ObterClientePorCodigo(codigo: String): String;
+begin
+  Result := '';
+
+  try
+    showmessage('0');
+
+    Query.Close;
+    Query.SQL.Text := 'Select Nome From Clientes Where Codigo = ' + codigo;
+    Query.Open;
+
+
+    showmessage(ClienteDao.Query.SQL.Text);
+    Query.Open;
+    showmessage('passou');
+
+    if Query.RecordCount > 0 then
+      Result := ClienteDao.Query.FieldByName('Nome').AsString;
+  except
+    On E: Exception do
+      ShowMessage('Erro: ' + E.Message);
+  end;
+
+end;
+
+end.
+
+
+

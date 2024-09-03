@@ -1,0 +1,32 @@
+unit PedidoController;
+
+interface
+
+uses
+  System.Classes, Data.DB, Datasnap.DBClient, PedidoModel,
+  FireDAC.Comp.Client, Conexao, System.Generics.Collections;
+
+type
+  TPedido = class
+
+  FNumeroDoPedido: Integer;
+  FNomeDoProduto: String;
+  private
+    FDataSource: TDataSource;
+    FTabela: TFDMemTable;
+  public
+    property Numero: Integer read FNumeroDoPedido write FNumeroDoPedido;
+
+    function ObterPedidoPorNumero(numero: Integer): TPedido;
+    function ObterProximoNumero: Integer;
+  end;
+
+
+implementation
+
+{ TPedidoController }
+
+end.
+
+
+

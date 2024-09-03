@@ -1,0 +1,148 @@
+unit UnitProduto;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Data.DB, Vcl.Grids, Vcl.DBGrids, ProdutoController,
+  FireDAC.Stan.Intf, FireDAC.Stan.Option, FireDAC.Stan.Param,
+  FireDAC.Stan.Error, FireDAC.DatS, FireDAC.Phys.Intf, FireDAC.DApt.Intf,
+  FireDAC.Comp.DataSet, FireDAC.Comp.Client, ProdutoModel,
+  System.Generics.Collections, Vcl.StdCtrls, Vcl.WinXCtrls;
+
+type
+  TfrmConsultarProduto = class(TForm)
+    gridClientes: TDBGrid;
+    dsDados: TDataSource;
+    Tabela: TFDMemTable;
+    scProduto: TSearchBox;
+    procedure FormShow(Sender: TObject);
+    procedure scProdutoInvokeSearch(Sender: TObject);
+    procedure scProdutoKeyDown(Sender: TObject; var Key: Word;
+      Shift: TShiftState);
+    procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure gridClientesTitleClick(Column: TColumn);
+  private
+    { Private declarations }
+    procedure filtrar;
+    procedure PopularDados(Produtos: TList<TProduto>);
+  public
+    { Public declarations }
+    var CampoOrdenado: String;
+  end;
+
+var
+  frmConsultarProduto: TfrmConsultarProduto;
+
+implementation
+
+{$R *.dfm}
+
+uses UnitPrincipal;
+
+
+procedure TfrmConsultarProduto.filtrar;
+var
+  filtro: String;
+
+  i: integer;
+begin
+
+  filtro := '';
+  for i := 0 to Tabela.Fields.Count -1 do
+    filtro := filtro + Tabela.Fields[i].FieldName + ' like ' + quotedStr('%' + scProduto.Text + '%') + ' or ';
+
+  filtro := Copy(filtro, 1, Length(filtro) - 4);
+
+  tabela.Filter := filtro;
+
+end;
+
+procedure TfrmConsultarProduto.FormKeyDown(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+  if key = VK_ESCAPE then
+    Close;
+end;
+
+procedure TfrmConsultarProduto.FormShow(Sender: TObject);
+var
+  Produtos: TList<TProduto>;
+begin
+
+  try
+    Produtos := frmPrincipal.ProdutoController.ObterProdutos();
+    PopularDados(Produtos);
+  finally
+    Produtos.Free;
+  end;
+
+end;
+
+procedure TfrmConsultarProduto.gridClientesTitleClick(Column: TColumn);
+begin
+  try
+    if CampoOrdenado = Column.FieldName then
+    begin
+      Tabela.IndexFieldNames := Column.FieldName + ':D';
+      CampoOrdenado := '';
+    end
+    else
+    begin
+      Tabela.IndexFieldNames := Column.FieldName;
+      CampoOrdenado := Column.FieldName;
+    end;
+  except
+    on E: Exception do
+      ShowMessage('Erro ao aplicar ordenação: ' + E.Message);
+  end;
+end;
+
+
+procedure TfrmConsultarProduto.PopularDados(Produtos: TList<TProduto>);
+var
+  Produto: TProduto
+begin
+
+  tabela.Close;
+  With tabela.FieldDefs do
+  begin
+    Clear;
+    Add('Codigo', ftInteger);
+    Add('Descricao', ftString, 60);
+    Add('Preco', ftFloat);
+  end;
+  tabela.CreateDataSet;
+  TFloatField(tabela.FieldByName('Preco')).DisplayFormat := '#,###,##0.00';
+  tabela.Open;
+
+  for Produto in Produtos do
+  begin
+
+    With tabela do
+    begin
+      Append;
+      FieldByName('Codigo').AsInteger := Produto.Codigo;
+      FieldByName('Descricao').AsString := Produto.Descricao;
+      FieldByName('Preco').AsFloat := Produto.Preco_Venda;
+    end;
+
+  end;
+
+  tabela.First;
+  scProduto.SetFocus;
+end;
+
+procedure TfrmConsultarProduto.scProdutoInvokeSearch(Sender: TObject);
+begin
+  Filtrar;
+end;
+
+procedure TfrmConsultarProduto.scProdutoKeyDown(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+  if (scProduto.text <> '') and (key = VK_RETURN) then
+    scProduto.OnInvokeSearch (self);
+end;
+
+end.

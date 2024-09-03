@@ -1,0 +1,121 @@
+unit PedidoController;
+
+interface
+
+uses
+  System.Classes, Data.DB, Datasnap.DBClient, PedidoModel,
+  FireDAC.Comp.Client, Conexao, System.Generics.Collections;
+
+type
+  TPedido = class
+
+  FNumeroDoPedido: Integer;
+  FNomeDoProduto: String;
+  private
+    FDataSource: TDataSource;
+    FTabela: TFDMemTable;
+  public
+    property Numero: Integer read FNumeroDoPedido write FNumeroDoPedido;
+
+//    class function ObterPedido: TList<TPedido>;
+//    class function AdicionarPedido: Boolean;
+//    class function AtualizarPedido(const Numero: Integer): Boolean;
+  end;
+
+
+implementation
+
+{ TClienteController }
+
+//class function TPedido.ObterPedido: TList<TPedido>;
+////var
+////  Conexao: TConexao;
+////  Qry: TFDQuery;
+////
+////  PedidoList: TList<TProduto>;
+////  Produto: TProduto;
+//begin
+////
+////  Conexao := TConexao.Create;
+////  qry := TFDQuery.Create(nil);
+////
+////  try
+////    qry.Connection := Conexao.FConexao;
+////    qry.SQL.Text := ' SELECT                                                                     '+
+////                    '   ped.numero_pedido AS numeroPedido,                                       '+
+////                    '   ped.data_emissao AS dataEmissao,                                         '+
+////                    '   ped.valor_total AS totalGeral,                                           '+
+////                    '   cli.codigo AS codigoCliente,                                             '+
+////                    '   cli.nome AS nomeCliente,                                                 '+
+////                    '   pep.codigo_produto AS codigoProduto,                                     '+
+////                    '   prod.descricao AS nomeProduto,                                           '+
+////                    '   prod.preco_venda AS precoVenda,                                          '+
+////                    '   pep.quantidade,                                                          '+
+////                    '   pep.valor_unitario AS valorVendido,                                      '+
+////                    '   pep.valor_total AS valorTotal                                            '+
+////                    ' FROM pedido ped                                                            '+
+////                    '   INNER JOIN pedidos_produtos pep ON pep.numero_pedido = ped.numero_pedido '+
+////                    '   INNER JOIN clientes cli ON ped.codigo_cliente = cli.codigo               '+
+////                    '   INNER JOIN produtos prod ON pep.codigo_produto = prod.codigo             ';
+////    qry.Open;
+////
+////    ProdutosList := TList<TProduto>.Create;
+////    try
+////
+////      while not (qry.eof) do
+////      begin
+////        Produto := TProduto.Create;
+////        Produto.Codigo := qry.FieldByName('Codigo').AsInteger;
+////        Produto.Descricao := qry.FieldByName('Descricao').AsString;
+////        Produto.Preco_Venda := qry.FieldByName('Preco_Venda').AsFloat;
+////
+////        ProdutosList.Add(Produto);
+////
+////        qry.Next;
+////      end;
+////
+////      Result := ProdutosList;
+////    finally
+////      qry.Free;
+////      Conexao.Free;
+////    end;
+////
+////
+////  finally
+////
+////  end;
+//
+//end;
+//
+////function TProdutoController.ObterProdutoPorCodigo(codigo: String): Boolean;
+////var
+////  Conexao: TConexao;
+////  Qry: TFDQuery;
+////begin
+////  Conexao := TConexao.Create;
+////  qry := TFDQuery.Create(nil);
+////
+////  Result := False;
+////
+////  try
+////    qry.Connection := Conexao.FConexao;
+////    qry.SQL.Text := 'Select Descricao as Nome, Preco_Venda as Valor From Produtos Where Codigo = ' + codigo;
+////    qry.Open;
+////
+////    if qry.RecordCount > 0 then
+////      Result := True;
+////
+////    Valor := qry.FieldByName('Valor').AsFloat;
+////    Nome  := qry.FieldByName('Nome').AsString;
+////
+////  finally
+////    qry.Free;
+////    Conexao.Free;
+////  end;
+////
+////end;
+//
+end.
+
+
+

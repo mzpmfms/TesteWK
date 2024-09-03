@@ -1,0 +1,42 @@
+unit DM;
+
+interface
+
+uses
+  System.SysUtils, System.Classes, FireDAC.Comp.Client, FireDAC.Stan.Def, FireDAC.Stan.Pool,
+  FireDAC.Stan.Async, FireDAC.DatS, FireDAC.Phys.Intf, FireDAC.DApt.Intf, Data.DB,
+  FireDAC.DApt, FireDAC.Stan.Param, Conexao;
+
+type
+  TDM = class(TDataModule)
+    FDQuery: TFDQuery;
+  private
+    FConexao: TConexao;
+  public
+    constructor Create(AOwner: TComponent); override;
+    destructor Destroy; override;
+  end;
+
+var
+  DataModule: TConexao;
+
+implementation
+
+{ TDM }
+
+constructor TDM.Create(AOwner: TComponent);
+begin
+  inherited Create(AOwner);
+
+  FConexao := DataModule.Create;
+  FDQuery.Connection := FConexao.GetConnection;
+
+end;
+
+destructor TDM.Destroy;
+begin
+
+  inherited;
+end;
+
+end.

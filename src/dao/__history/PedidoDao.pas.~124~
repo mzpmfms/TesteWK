@@ -1,0 +1,219 @@
+unit PedidoDao;
+
+interface
+
+uses
+  System.Classes, Data.DB, Datasnap.DBClient, Dao, PedidoModel,
+  FireDAC.Comp.Client, Conexao, System.Generics.Collections,
+  System.SysUtils, Vcl.Dialogs, PedidosProdutosModel;
+
+type
+  TPedidoDao = class
+    FDao: TDao;
+    FQuery: TFDQuery;
+    private
+
+    public
+
+      constructor Create(AOwner: TComponent);
+      destructor Destroy; override;
+
+      property Query: TFDQuery read FQuery write FQuery;
+      property Dao: TDao read FDao write FDao;
+
+      function ObterPedidoPorNumero(numero: Integer): TFDQuery;
+      function ObterProximoNumero: Integer;
+
+      function PedidoExistePorNumero(numero: Integer): Boolean;
+
+      procedure Adicionar(Numero: Integer; Data_emissao: TDateTime; Codigo_Cliente: Integer; Valor_Total: Real);
+      procedure AdicionarItens(Pedido, Produto, Quantidade: Integer; Valor, Total: Real);
+
+      procedure AtualizarItem(id, Produto, Quantidade: Integer; Valor, Total: Real);
+
+      procedure Remover(pedido: integer);
+
+  end;
+
+
+implementation
+
+procedure TPedidoDao.AdicionarItens(Pedido, Produto, Quantidade: Integer; Valor, Total: Real);
+begin
+
+  try
+    Query.Close;
+    Query.SQL.Text := ' INSERT INTO pedidos_produtos '+
+                      '   (numero_pedido, codigo_produto, quantidade, valor_unitario, valor_total) '+
+                      ' VALUES '+
+                      '   (:pedido, :produto, :quantidade, :valor, :total) ';
+
+    Query.ParamByName('Pedido').AsInteger := Pedido;
+    Query.ParamByName('Produto').AsInteger := Produto;
+    Query.ParamByName('Quantidade').AsInteger := Quantidade;
+    Query.ParamByName('Valor').AsFloat := Valor;
+    Query.ParamByName('Total').AsFloat := Total;
+    Query.ExecSQL;
+
+  except
+    On E: Exception do
+    begin
+      Dao.FConexao.Rollback;
+      ShowMessage('Não foi possivel salvar pedido ' + E.Message);
+    end;
+  end;
+end;
+
+procedure TPedidoDao.AtualizarItem(id, Produto, Quantidade: Integer; Valor, Total: Real);
+begin
+  Dao.FConexao.StartTransaction;
+  try
+    Query.Close;
+    Query.SQL.Text := ' UPDATE pedidos_produtos SET '+
+                      '   codigo_produto = :produto, ' +
+                      '   quantidade = :quantidade, ' +
+                      '   valor_unitario = :valor,' +
+                      '   valor_total = :total ' +
+                      ' WHERE id = :id ';
+
+
+    Query.ParamByName('id').AsInteger := id;
+    Query.ParamByName('Produto').AsInteger := Produto;
+    Query.ParamByName('Quantidade').AsInteger := Quantidade;
+    Query.ParamByName('Valor').AsFloat := Valor;
+    Query.ParamByName('Total').AsFloat := Total;
+    Query.ExecSQL;
+
+    Dao.FConexao.Commit;
+  except
+    On E: Exception do
+    begin
+      Dao.FConexao.Rollback;
+      ShowMessage('Não foi possivel salvar pedido ' + E.Message);
+    end;
+  end;
+end;
+
+constructor TPedidoDao.Create(AOwner: TComponent);
+begin
+  Dao := TDao.Create;
+
+  Query := TFDQuery.Create(nil);
+  Query.Connection := Dao.obterConexao;
+end;
+
+destructor TPedidoDao.Destroy;
+begin
+
+  Query.Free;
+  Dao.Free;
+
+  inherited;
+end;
+
+procedure TPedidoDao.Adicionar(Numero: Integer; Data_emissao: TDateTime;
+  Codigo_Cliente: Integer; Valor_Total: Real);
+begin
+
+  try
+    Query.Close;
+    Query.SQL.Text := ' INSERT INTO pedido '+
+                      '   (data_emissao, codigo_cliente, valor_total) '+
+                      ' VALUES '+
+                      '   (:data, :codigoCliente, :valorTotal) ';
+
+    Query.ParamByName('data').AsDateTime := Data_Emissao;
+    Query.ParamByName('codigoCliente').AsInteger := Codigo_Cliente;
+    Query.ParamByName('valorTotal').AsFloat := Valor_Total;
+
+    Query.ExecSQL;
+  except
+    On E: Exception do
+    begin
+      Dao.FConexao.Rollback;
+      ShowMessage('Não foi possivel salvar pedido ' + E.Message);
+    end;
+  end;
+
+end;
+
+
+function TPedidoDao.ObterPedidoPorNumero(numero: Integer): TFDQuery;
+begin
+
+  try
+    Query.Close;
+    Query.SQL.Text := ' SELECT '+
+                      '    pp.id, '+
+                      '    pe.numero_pedido, '+
+                      '    pe.data_emissao, '+
+                      '    pe.codigo_cliente, '+
+                      '    cl.nome, '+
+                      '    pp.codigo_produto, '+
+                      '    pr.descricao as produto, '+
+                      '    pp.quantidade, '+
+                      '    pp.valor_unitario, '+
+                      '    pp.valor_total '+
+                      ' FROM pedidos_produtos pp '+
+                      ' INNER JOIN pedido pe on (pp.numero_pedido = pe.numero_pedido) '+
+                      ' INNER JOIN clientes cl on (pe.codigo_cliente = cl.codigo) '+
+                      ' INNER JOIN produtos pr on (pr.codigo = pp.codigo_produto) '+
+                      ' WHERE pe.numero_pedido = ' + IntToStr(numero);
+
+    Query.Open;
+
+    Result := Query;
+  except
+    On E: Exception do
+      ShowMessage('Erro: ' + E.Message);
+  end;
+
+end;
+
+function TPedidoDao.ObterProximoNumero: Integer;
+begin
+  try
+    Query.Close;
+    Query.SQL.Text := ' SELECT count(*) + 1 as Numero '+
+                      ' FROM Pedido ';
+    Query.Open;
+
+    Result := Query.FieldByName('Numero').AsInteger;
+  except
+    On E: Exception do
+      ShowMessage('Erro: ' + E.Message);
+  end;
+end;
+
+function TPedidoDao.PedidoExistePorNumero(numero: Integer): Boolean;
+begin
+
+  Result := false;
+  try
+    Query.Close;
+    Query.SQL.Text := ' SELECT numero_pedido FROM pedido '+
+                      ' WHERE numero_pedido = :numero LIMIT 1';
+    Query.ParamByName('numero').AsInteger := numero;
+    Query.Open;
+
+    if Query.RecordCount > 0 then
+      Result := True;
+  except
+    On E: Exception do
+      ShowMessage('Erro: ' + E.Message);
+  end;
+end;
+
+procedure TPedidoDao.Remover(pedido: integer);
+begin
+    Query.Close;
+    Query.SQL.Text := ' DELETE FROM pedidos_produtos ' +
+                      ' WHERE numero
+    Query.ParamByName('numero_pedido').AsInteger := pedido;
+    Query.Open;
+end;
+
+end.
+
+
+
