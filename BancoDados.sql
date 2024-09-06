@@ -14,6 +14,20 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
+
+-- Copiando estrutura do banco de dados para wk
+CREATE DATABASE IF NOT EXISTS `wk` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci */;
+USE `wk`;
+
+-- Copiando estrutura para tabela wk.clientes
+CREATE TABLE IF NOT EXISTS `clientes` (
+  `codigo` int(11) NOT NULL AUTO_INCREMENT,
+  `nome` varchar(100) NOT NULL,
+  `cidade` varchar(100) NOT NULL,
+  `UF` varchar(2) NOT NULL,
+  PRIMARY KEY (`codigo`)
+) ENGINE=InnoDB AUTO_INCREMENT=21 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
 -- Copiando dados para a tabela wk.clientes: ~20 rows (aproximadamente)
 INSERT IGNORE INTO `clientes` (`codigo`, `nome`, `cidade`, `UF`) VALUES
 	(1, 'João da Silva', 'São Paulo', 'SP'),
@@ -37,11 +51,43 @@ INSERT IGNORE INTO `clientes` (`codigo`, `nome`, `cidade`, `UF`) VALUES
 	(19, 'Rodrigo Monteiro', 'Cuiabá', 'MT'),
 	(20, 'Patrícia Nunes', 'Campo Grande', 'MS');
 
+-- Copiando estrutura para tabela wk.pedido
+CREATE TABLE IF NOT EXISTS `pedido` (
+  `numero_pedido` int(11) NOT NULL AUTO_INCREMENT,
+  `data_emissao` date NOT NULL,
+  `codigo_cliente` int(11) NOT NULL,
+  `valor_total` decimal(10,2) NOT NULL,
+  PRIMARY KEY (`numero_pedido`),
+  KEY `FK_CLIENTE` (`codigo_cliente`),
+  CONSTRAINT `FK_CLIENTE` FOREIGN KEY (`codigo_cliente`) REFERENCES `clientes` (`codigo`),
+  CONSTRAINT `FK_ITENS` FOREIGN KEY (`numero_pedido`) REFERENCES `pedidos_produtos` (`numero_pedido`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
 -- Copiando dados para a tabela wk.pedido: ~0 rows (aproximadamente)
 
--- Copiando dados para a tabela wk.pedidos_produtos: ~1 rows (aproximadamente)
+-- Copiando estrutura para tabela wk.pedidos_produtos
+CREATE TABLE IF NOT EXISTS `pedidos_produtos` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `numero_pedido` int(11) NOT NULL,
+  `codigo_produto` int(11) NOT NULL,
+  `quantidade` int(11) NOT NULL,
+  `valor_unitario` decimal(10,2) NOT NULL,
+  `valor_total` decimal(10,2) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `FK_PEDIDO` (`numero_pedido`)
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- Copiando dados para a tabela wk.pedidos_produtos: ~0 rows (aproximadamente)
 INSERT IGNORE INTO `pedidos_produtos` (`id`, `numero_pedido`, `codigo_produto`, `quantidade`, `valor_unitario`, `valor_total`) VALUES
 	(2, 1, 2, 1, 3499.00, 3499.00);
+
+-- Copiando estrutura para tabela wk.produtos
+CREATE TABLE IF NOT EXISTS `produtos` (
+  `codigo` int(11) NOT NULL AUTO_INCREMENT,
+  `descricao` varchar(100) NOT NULL,
+  `preco_venda` decimal(10,2) NOT NULL,
+  PRIMARY KEY (`codigo`)
+) ENGINE=InnoDB AUTO_INCREMENT=21 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- Copiando dados para a tabela wk.produtos: ~20 rows (aproximadamente)
 INSERT IGNORE INTO `produtos` (`codigo`, `descricao`, `preco_venda`) VALUES
